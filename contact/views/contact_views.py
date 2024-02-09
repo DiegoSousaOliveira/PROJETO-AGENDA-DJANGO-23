@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render, redirect
-
+from django.db.models import Q
 from contact.models import Contact
 
 def index(request):
@@ -24,7 +24,13 @@ def search(request):
 
   contacts = Contact.objects \
     .filter(show=True) \
-    .order_by('-id')[10:20]
+    .filter(
+      Q(first_name__icontains=search_value) |
+      Q(last_name__icontains=search_value)  |
+      Q(phone__icontains=search_value) |
+      Q(email__icontains=search_value)
+            ) \
+    .order_by('-id')
 
   context = {
     'contacts': contacts,
